@@ -3,7 +3,8 @@
 \usepackage{geometry}
 \usepackage{hyperref}
 \geometry{margin=1in}
-\title{Identity is Conserved. Meaning is Negotiated.\\A Mathematical Perspective on Master Data Management}
+\title{Identity is Conserved. Meaning is Negotiated.\\
+A Mathematical Perspective on Master Data Management}
 \author{Christian Garbers}
 \date{}
 \newtheorem{theorem}{Theorem}
@@ -13,52 +14,191 @@
 
 \begin{abstract}
 Traditional Master Data Management (MDM) initiatives frequently pursue a ``single source of truth'' through semantic alignment and canonical data models. This paper argues that such efforts target the wrong optimization problem. Identity and meaning exhibit fundamentally different mathematical properties. Identity is a convergence problem and can often be made globally consistent across an enterprise. Meaning is inherently contextual, domain-dependent, and evolves through use. Consequently, semantic variance can be reduced but never eliminated. We propose the principle:
-\begin{center}\textbf{Identity is conserved. Meaning is negotiated.}\end{center}
+\begin{center}
+\textbf{Identity is conserved. Meaning is negotiated.}
+\end{center}
 and derive several consequences for MDM, governance, metadata, and enterprise architecture.
 \end{abstract}
 
 \section{Introduction}
-Most enterprises contain multiple representations of the same real-world entity. A customer may simultaneously be a legal entity for Finance, an account for Sales, a screened party for Compliance, and a shipper for Operations. Traditional MDM assumes these perspectives should converge toward a single canonical representation. This assumption often produces substantial governance overhead, continuous exception handling, and prolonged debates about definitions rather than identities. We argue that the root cause is a category error: identity and meaning obey different optimization criteria.
+Most enterprises contain multiple representations of the same real-world entity. A customer may simultaneously be:
+\begin{itemize}
+\item a legal entity for Finance,
+\item an account for Sales,
+\item a screened party for Compliance,
+\item a shipper for Operations.
+\end{itemize}
+Traditional MDM assumes these perspectives should converge toward a single canonical representation. This assumption often produces substantial governance overhead, continuous exception handling, and prolonged debates about definitions rather than identities.
+
+We argue that the root cause is a category error:
+\begin{quote}
+Identity and meaning obey different optimization criteria.
+\end{quote}
 
 \section{Identity and Meaning}
-Let $I(e,t)$ denote the identity assigned to entity $e$ at time $t$, and $M(e,D,t)$ its meaning within domain $D$. Identity answers ``What are we talking about?'' Meaning answers ``What does it mean?''
+Let
+\[
+I(e,t)
+\]
+denote the identity assigned to entity $e$ at time $t$. Let
+\[
+M(e,D,t)
+\]
+denote the meaning of entity $e$ within domain $D$ at time $t$.
+
+Identity answers the question:
+\begin{quote}
+What are we talking about?
+\end{quote}
+Meaning answers the question:
+\begin{quote}
+What does it mean?
+\end{quote}
+The distinction is fundamental.
 
 \section{Identity Conservation}
-For a valid enterprise identity model, all domains should agree regarding the referent of an entity:
-\[\forall D_i,D_j: I_{D_i}(e,t)=I_{D_j}(e,t).\]
-This motivates $\min \operatorname{Var}(I)$ and, ideally, $\operatorname{Var}(I)\rightarrow0$. Identity is therefore a convergence problem.
+For a valid enterprise identity model, all domains should agree regarding the referent of an entity. Therefore,
+\[
+\forall D_i,D_j: I_{D_i}(e,t) = I_{D_j}(e,t).
+\]
+This motivates the optimization objective
+\[
+\min Var(I).
+\]
+In the ideal case,
+\[
+Var(I) \rightarrow 0.
+\]
+Identity is therefore a convergence problem.
 
 \section{Semantic Diversity}
-Different domains legitimately assign different interpretations to the same entity:
-\[\exists D_i,D_j: M(e,D_i,t)\neq M(e,D_j,t).\]
-For any non-trivial enterprise, $\operatorname{Var}(M)>0$. Semantic diversity reflects specialization, purpose, and organizational structure. Meaning is therefore a negotiation problem.
+Meaning behaves differently. Different domains legitimately assign different interpretations to the same entity. Consequently,
+\[
+\exists D_i,D_j: M(e,D_i,t) \neq M(e,D_j,t).
+\]
+For any non-trivial enterprise,
+\[
+Var(M) > 0.
+\]
+Semantic diversity is not necessarily a defect. Rather, it reflects specialization, purpose, and organizational structure. Meaning is therefore a negotiation problem.
 
 \section{The Governance Law}
-Let $G$ represent governance intensity. Governance may damp semantic variance,
-\[\operatorname{Var}(M_{after})<\operatorname{Var}(M_{before}),\]
-but as long as domains retain distinct objectives we expect
-\[\lim_{G\rightarrow\infty}\operatorname{Var}(M)=k,\qquad k>0.\]
+Governance attempts to reduce semantic variance. Let
+\[
+G
+\]
+represent governance intensity. Then governance acts as a damping function:
+\[
+Var(M_{after}) < Var(M_{before}).
+\]
+However,
+\[
+\lim_{G \rightarrow \infty} Var(M) = k
+\]
+for some
+\[
+k > 0.
+\]
+In words:
+\begin{quote}
 Governance can reduce semantic disagreement, but cannot eliminate it.
+\end{quote}
+As long as multiple business domains retain distinct objectives, a non-zero semantic variance remains.
 
 \section{The Conservation--Negotiation Principle}
+From the previous sections we obtain:
+\[
+Var(I) \rightarrow 0
+\]
+while
+\[
+Var(M) > 0.
+\]
+Therefore:
+\begin{quote}
+Identity should converge. Meaning should remain free to evolve.
+\end{quote}
+This yields the central theorem.
+
 \begin{theorem}[Conservation--Negotiation Principle]
-For any sufficiently complex enterprise, $\min\operatorname{Var}(I)$ is a meaningful and often achievable objective, while $\min\operatorname{Var}(M)$ has a non-zero lower bound. Therefore an architecture that attempts to eliminate semantic variance is optimizing the wrong variable.
+For any sufficiently complex enterprise:
+\[
+\min Var(I)
+\]
+is a meaningful and often achievable objective, while
+\[
+\min Var(M)
+\]
+has a non-zero lower bound. Therefore an architecture that attempts to eliminate semantic variance is optimizing the wrong variable.
 \end{theorem}
 
 \section{The Branch Theorem}
-Let each domain maintain a representation branch $B_D(e)$. The branches of Finance, Sales, and Operations naturally diverge as they specialize. The architectural goal is not representation convergence but identity preservation across representations.
+Consider each domain as maintaining its own representation branch
+\[
+B_D(e).
+\]
+Over time:
+\[
+B_{Finance}(e), \; B_{Sales}(e), \; B_{Operations}(e)
+\]
+naturally diverge. This divergence reflects specialization. Thus,
+\[
+\frac{d}{dt}Var(B_D) > 0
+\]
+is frequently expected. Attempts to force
+\[
+B_{Finance} = B_{Sales} = B_{Operations}
+\]
+often remove valuable contextual information. The goal should therefore not be representation convergence, but identity preservation across representations.
 
 \section{Metadata Revisited}
-A useful interpretation is $\text{Metadata}=\operatorname{Record}(\operatorname{Negotiation}(M))$. Business glossaries, canonical models, and taxonomies are institutionalized semantic treaties: records of current agreement between communities regarding meaning.
+Metadata is frequently described as:
+\begin{quote}
+Data about data.
+\end{quote}
+A more useful interpretation is:
+\[
+Metadata = Record(Negotiation(M)).
+\]
+Metadata does not record objective truth. Rather, it records the current agreement between communities regarding meaning. Business glossaries, canonical models, and taxonomies are therefore best understood as institutionalized semantic treaties.
 
 \section{Implications for Master Data Management}
-Identity-centric MDM prioritizes identity resolution, cross-system matching, decision provenance, stable references, and representation lineage. It accepts semantic plurality while preserving referential integrity.
+Traditional MDM implicitly optimizes
+\[
+\min Var(M).
+\]
+This objective leads to:
+\begin{itemize}
+\item endless definitional debates,
+\item exception management,
+\item governance committees,
+\item continuous model revisions.
+\end{itemize}
+Identity-centric MDM instead optimizes
+\[
+\min Var(I).
+\]
+Its primary concerns become:
+\begin{itemize}
+\item identity resolution,
+\item cross-system matching,
+\item survivorship provenance,
+\item stable references,
+\item representation lineage.
+\end{itemize}
+This approach accepts semantic plurality while preserving referential integrity.
 
 \section{Conclusion}
-Enterprise architecture has historically confused reference with meaning. Reference can converge; meaning evolves through use. Thus,
-\[\text{Architecture}=\operatorname{Conservation}(I)+\operatorname{Negotiation}(M).\]
-The practical objective is stable identity across multiple valid versions of reality.
-\begin{center}\Large\textbf{Identity is conserved. Meaning is negotiated.}\end{center}
+Enterprise architecture has historically confused reference with meaning. Reference can converge. Meaning evolves through use. Consequently:
+\[
+Architecture = Conservation(I) + Negotiation(M).
+\]
+The practical objective is not a single version of the truth. The practical objective is stable identity across multiple valid versions of reality.
+
+\begin{center}
+\Large \textbf{Identity is conserved. Meaning is negotiated.}
+\end{center}
+
 MDM often attempts to negotiate what should be conserved and conserve what should be negotiated.
 
 \end{document}
