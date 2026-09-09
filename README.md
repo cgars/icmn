@@ -44,7 +44,7 @@ paper/               source of the accompanying paper
 .github/             CI and contribution automation
 ```
 
-Start with [AGENTS.md](AGENTS.md) when using Codex and [docs/architecture.md](docs/architecture.md) when making design decisions.
+Start with [AGENTS.md](AGENTS.md) when using Codex, [docs/architecture.md](docs/architecture.md) when making design decisions, and [docs/threat-model.md](docs/threat-model.md) before changing a trust boundary or security-sensitive workflow.
 
 ## Scope of the first usable release
 

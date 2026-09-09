@@ -40,6 +40,8 @@ The initial in-memory adapter proves behavior. Persistence should be implemented
 
 Authentication and tenant isolation are required before multi-user deployment. Authorization must consider action, entity kind, domain, assertion predicate, and source system. Audit records must be append-only and redactable only through a separately recorded privacy operation.
 
+The maintained [threat assessment](threat-model.md) defines the trust boundaries, threat register, security invariants, verification programme, and release gates. A feature is not complete merely because its happy path works: changes to matching, decisions, connectors, tenancy, or sensitive data flows must implement or explicitly track the corresponding controls.
+
 ## Architecture decisions to record next
 
 - identity merge/split event model
