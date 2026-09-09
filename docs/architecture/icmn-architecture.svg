@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">ICMN architecture</title>
+  <desc id="desc">Identity is conserved in a stable identity plane while domain meaning remains contextual in a negotiated meaning plane. External source records remain behind controlled connectors. Both planes share provenance, an audit ledger, PostgreSQL, and an outbox.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8fafc"/>
+      <stop offset="1" stop-color="#eef2f7"/>
+    </linearGradient>
+    <linearGradient id="identity" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e8f2ff"/>
+      <stop offset="1" stop-color="#d8e9ff"/>
+    </linearGradient>
+    <linearGradient id="meaning" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff3df"/>
+      <stop offset="1" stop-color="#f9e7ff"/>
+    </linearGradient>
+    <filter id="shadow" x="-15%" y="-15%" width="130%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#152238" flood-opacity=".12"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#526173"/>
+    </marker>
+    <style>
+      .title{font:700 40px system-ui,-apple-system,Segoe UI,sans-serif;fill:#152238}.tag{font:500 21px system-ui,-apple-system,Segoe UI,sans-serif;fill:#526173}.h{font:700 24px system-ui,-apple-system,Segoe UI,sans-serif;fill:#152238}.sub{font:500 16px system-ui,-apple-system,Segoe UI,sans-serif;fill:#526173}.boxh{font:650 18px system-ui,-apple-system,Segoe UI,sans-serif;fill:#152238}.boxs{font:500 14px system-ui,-apple-system,Segoe UI,sans-serif;fill:#526173}.line{stroke:#526173;stroke-width:2.5;fill:none;marker-end:url(#arrow)}.dash{stroke-dasharray:9 7}.small{font:600 13px system-ui,-apple-system,Segoe UI,sans-serif;fill:#526173;letter-spacing:.03em}.pill{font:650 14px system-ui,-apple-system,Segoe UI,sans-serif;fill:#fff}
+    </style>
+  </defs>
+
+  <rect width="1600" height="1000" rx="24" fill="url(#bg)"/>
+  <text x="70" y="72" class="title">ICMN architecture</text>
+  <text x="70" y="108" class="tag">Identity is conserved. Meaning is negotiated.</text>
+
+  <rect x="575" y="145" width="600" height="105" rx="20" fill="#fff" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
+  <text x="875" y="184" class="h" text-anchor="middle">Access and stewardship</text>
+  <text x="875" y="216" class="sub" text-anchor="middle">HTTP API · steward workbench · policy context</text>
+
+  <rect x="55" y="300" width="270" height="475" rx="22" fill="#fff" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="190" y="342" class="h" text-anchor="middle">Source domains</text>
+  <text x="190" y="368" class="sub" text-anchor="middle">Records remain authoritative here</text>
+  <rect x="85" y="405" width="210" height="72" rx="15" fill="#e8f1ff" stroke="#86aee8"/>
+  <circle cx="112" cy="441" r="9" fill="#3478c9"/><text x="135" y="447" class="boxh">Finance</text>
+  <rect x="85" y="502" width="210" height="72" rx="15" fill="#fff0df" stroke="#e3a15a"/>
+  <circle cx="112" cy="538" r="9" fill="#d8782b"/><text x="135" y="544" class="boxh">Sales</text>
+  <rect x="85" y="599" width="210" height="72" rx="15" fill="#e7f7ed" stroke="#6ab486"/>
+  <circle cx="112" cy="635" r="9" fill="#338c58"/><text x="135" y="641" class="boxh">Operations</text>
+  <text x="190" y="719" class="boxs" text-anchor="middle">Legal entity · account · shipper</text>
+  <text x="190" y="742" class="boxs" text-anchor="middle">Different views, valid purposes</text>
+
+  <rect x="370" y="300" width="205" height="475" rx="22" fill="#f8fafc" stroke="#8a99aa" stroke-width="2" stroke-dasharray="10 7"/>
+  <text x="472" y="342" class="h" text-anchor="middle">Connector</text>
+  <text x="472" y="370" class="h" text-anchor="middle">boundary</text>
+  <rect x="397" y="414" width="150" height="76" rx="14" fill="#fff" stroke="#9aa8b8"/>
+  <text x="472" y="445" class="boxh" text-anchor="middle">References</text>
+  <text x="472" y="468" class="boxs" text-anchor="middle">not copies</text>
+  <rect x="397" y="519" width="150" height="76" rx="14" fill="#fff" stroke="#9aa8b8"/>
+  <text x="472" y="550" class="boxh" text-anchor="middle">Controlled</text>
+  <text x="472" y="573" class="boxs" text-anchor="middle">dereferencing</text>
+  <rect x="397" y="624" width="150" height="76" rx="14" fill="#fff" stroke="#9aa8b8"/>
+  <text x="472" y="655" class="boxh" text-anchor="middle">Isolated</text>
+  <text x="472" y="678" class="boxs" text-anchor="middle">credentials</text>
+
+  <rect x="625" y="300" width="410" height="475" rx="24" fill="url(#identity)" stroke="#3478c9" stroke-width="3" filter="url(#shadow)"/>
+  <rect x="650" y="320" width="158" height="29" rx="14" fill="#3478c9"/>
+  <text x="729" y="340" class="pill" text-anchor="middle">CONSERVED</text>
+  <text x="655" y="390" class="h">Identity plane</text>
+  <text x="655" y="418" class="sub">What are we talking about?</text>
+  <rect x="655" y="451" width="350" height="63" rx="14" fill="#fff" stroke="#86aee8"/>
+  <text x="680" y="479" class="boxh">Identity registry</text><text x="680" y="500" class="boxs">Opaque stable ICMN identifiers</text>
+  <rect x="655" y="530" width="350" height="63" rx="14" fill="#fff" stroke="#86aee8"/>
+  <text x="680" y="558" class="boxh">Reference registry</text><text x="680" y="579" class="boxs">Typed keys mapped to identities</text>
+  <rect x="655" y="609" width="350" height="63" rx="14" fill="#fff" stroke="#86aee8"/>
+  <text x="680" y="637" class="boxh">Match proposals</text><text x="680" y="658" class="boxs">Evidence and explainable confidence</text>
+  <rect x="655" y="688" width="350" height="63" rx="14" fill="#fff" stroke="#86aee8"/>
+  <text x="680" y="716" class="boxh">Governed decisions</text><text x="680" y="737" class="boxs">Audited, reversible merge and split</text>
+
+  <rect x="1080" y="300" width="465" height="475" rx="24" fill="url(#meaning)" stroke="#a65cc5" stroke-width="3" filter="url(#shadow)"/>
+  <rect x="1105" y="320" width="158" height="29" rx="14" fill="#a65cc5"/>
+  <text x="1184" y="340" class="pill" text-anchor="middle">NEGOTIATED</text>
+  <text x="1110" y="390" class="h">Meaning plane</text>
+  <text x="1110" y="418" class="sub">What does it mean here and now?</text>
+  <rect x="1110" y="451" width="405" height="70" rx="14" fill="#fff" stroke="#c89ad9"/>
+  <text x="1135" y="480" class="boxh">Temporal assertion ledger</text><text x="1135" y="503" class="boxs">Domain · predicate · value · validity</text>
+  <rect x="1110" y="538" width="405" height="70" rx="14" fill="#fff" stroke="#c89ad9"/>
+  <text x="1135" y="567" class="boxh">Schemas and semantic treaties</text><text x="1135" y="590" class="boxs">Versioned agreements, not universal truth</text>
+  <rect x="1110" y="625" width="405" height="70" rx="14" fill="#fff" stroke="#c89ad9"/>
+  <text x="1135" y="654" class="boxh">Conflict views</text><text x="1135" y="677" class="boxs">Plural assertions remain visible</text>
+  <rect x="1110" y="712" width="112" height="36" rx="18" fill="#3478c9"/><text x="1166" y="735" class="pill" text-anchor="middle">Finance</text>
+  <rect x="1234" y="712" width="102" height="36" rx="18" fill="#d8782b"/><text x="1285" y="735" class="pill" text-anchor="middle">Sales</text>
+  <rect x="1348" y="712" width="140" height="36" rx="18" fill="#338c58"/><text x="1418" y="735" class="pill" text-anchor="middle">Operations</text>
+
+  <rect x="735" y="824" width="675" height="80" rx="19" fill="#312e58" filter="url(#shadow)"/>
+  <text x="1072" y="858" class="h" text-anchor="middle" fill="#fff" style="fill:#fff">Provenance and decision ledger</text>
+  <text x="1072" y="884" class="sub" text-anchor="middle" fill="#dddaf5" style="fill:#dddaf5">Attributable · append-only · explainable · recoverable</text>
+  <rect x="865" y="932" width="415" height="48" rx="18" fill="#fff" stroke="#8a99aa" stroke-width="2"/>
+  <text x="1072" y="962" class="boxh" text-anchor="middle">PostgreSQL · transactional outbox</text>
+
+  <path d="M325 538 H370" class="line dash"/>
+  <path d="M575 538 H625" class="line"/>
+  <path d="M875 250 V275 H830 V300" class="line"/>
+  <path d="M875 275 H1312 V300" class="line"/>
+  <path d="M830 775 V800 H930 V824" class="line"/>
+  <path d="M1312 775 V800 H1215 V824" class="line"/>
+  <path d="M1072 904 V932" class="line"/>
+  <text x="339" y="523" class="small">REFERENCE</text>
+  <text x="70" y="955" class="small">Solid lines: controlled flow</text>
+  <line x1="255" y1="950" x2="315" y2="950" stroke="#526173" stroke-width="2.5" stroke-dasharray="9 7"/>
+  <text x="330" y="955" class="small">External reference, not replication</text>
+</svg>

@@ -10,6 +10,8 @@ The project intentionally separates three things that conventional MDM often col
 - **References** — links to representations held in source systems; source data need not be copied into ICMN.
 - **Meaning** — versioned, attributable assertions made by domains about an identity.
 
+![ICMN architecture: a conserved identity plane connected to negotiated domain meaning through provenance and governed references](docs/architecture/icmn-architecture.svg)
+
 ## Status
 
 This repository is at the architectural seed stage. The initial Go service is deliberately small but executable. It demonstrates the core model and gives contributors and coding agents a tested foundation rather than a speculative framework.
