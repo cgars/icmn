@@ -1,0 +1,94 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ICMN API",
+    "version": "1.0.0",
+    "description": "The ICMN v1 API keeps conserved identities, external representations, and domain-owned meaning distinct. Request bodies are limited to 1 MiB. Timestamps are serialized as RFC 3339 UTC values."
+  },
+  "servers": [{"url": "/", "description": "Current ICMN service"}],
+  "paths": {
+    "/healthz": {
+      "get": {
+        "summary": "Report service health",
+        "operationId": "getHealth",
+        "responses": {
+          "200": {
+            "description": "The service is running.",
+            "content": {"application/json": {"schema": {"type": "object", "required": ["status"], "properties": {"status": {"type": "string", "const": "ok"}}}, "example": {"status": "ok"}}}
+          }
+        }
+      }
+    },
+    "/v1/entities": {
+      "post": {
+        "summary": "Create a conserved identity",
+        "description": "Creates an opaque ICMN identity without business attributes. The JSON request body is limited to 1 MiB.",
+        "operationId": "createEntity",
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateEntity"}, "example": {"kind": "organization"}}}},
+        "responses": {
+          "201": {"description": "Identity created.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Entity"}}}},
+          "400": {"$ref": "#/components/responses/BadRequest"}
+        }
+      }
+    },
+    "/v1/entities/{id}": {
+      "parameters": [{"$ref": "#/components/parameters/EntityID"}],
+      "get": {
+        "summary": "Retrieve a conserved identity",
+        "operationId": "getEntity",
+        "responses": {
+          "200": {"description": "The identity, its external references, and its independently owned assertions.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Entity"}, "examples": {"domainDisagreement": {"summary": "Finance and Sales retain different assertions", "value": {"id": "ent_0123456789abcdef0123456789abcdef", "kind": "organization", "created_at": "2026-09-09T10:00:00Z", "assertions": [{"id": "ast_0123456789abcdef0123456789abcdef", "domain": "finance", "predicate": "customer-status", "value": "delinquent", "valid_from": "2026-09-01T00:00:00Z", "provenance": {"source": "finance-ledger"}, "recorded_at": "2026-09-09T10:01:00Z"}, {"id": "ast_fedcba9876543210fedcba9876543210", "domain": "sales", "predicate": "customer-status", "value": "strategic", "valid_from": "2026-09-01T00:00:00Z", "provenance": {"source": "sales-crm", "actor": "sales-ops", "method": "review"}, "recorded_at": "2026-09-09T10:02:00Z"}]}}}}}},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/v1/entities/{id}/references": {
+      "parameters": [{"$ref": "#/components/parameters/EntityID"}],
+      "post": {
+        "summary": "Attach an external reference",
+        "description": "Attaches a typed address of an externally managed representation; it does not make the source key the identity or dereference the optional URI. The JSON request body is limited to 1 MiB.",
+        "operationId": "addExternalReference",
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ExternalReference"}, "example": {"source_system": "crm", "object_type": "account", "source_key": "42", "uri": "https://crm.example/accounts/42"}}}},
+        "responses": {
+          "201": {"description": "Reference attached; returns the updated identity.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Entity"}}}},
+          "400": {"$ref": "#/components/responses/BadRequest"},
+          "404": {"$ref": "#/components/responses/NotFound"},
+          "409": {"$ref": "#/components/responses/Conflict"}
+        }
+      }
+    },
+    "/v1/entities/{id}/assertions": {
+      "parameters": [{"$ref": "#/components/parameters/EntityID"}],
+      "post": {
+        "summary": "Record a domain assertion",
+        "description": "Records contextual, attributable meaning without mutating identity semantics or resolving disagreement. The JSON request body is limited to 1 MiB.",
+        "operationId": "addAssertion",
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Assertion"}, "examples": {"finance": {"value": {"domain": "finance", "predicate": "customer-status", "value": "delinquent", "valid_from": "2026-09-01T00:00:00Z", "provenance": {"source": "finance-ledger"}}}, "sales": {"value": {"domain": "sales", "predicate": "customer-status", "value": "strategic", "valid_from": "2026-09-01T00:00:00Z", "provenance": {"source": "sales-crm", "method": "review"}}}}}}},
+        "responses": {
+          "201": {"description": "Assertion recorded; returns the updated identity with all assertions preserved.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Entity"}}}},
+          "400": {"$ref": "#/components/responses/BadRequest"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "EntityID": {"name": "id", "in": "path", "required": true, "description": "Opaque ICMN identity; never a source-system key.", "schema": {"type": "string", "pattern": "^ent_[0-9a-f]{32}$"}, "example": "ent_0123456789abcdef0123456789abcdef"}
+    },
+    "responses": {
+      "BadRequest": {"description": "The JSON body is malformed, exceeds 1 MiB, has unknown fields, or fails domain validation.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}, "example": {"error": "invalid input: kind is required"}}}},
+      "NotFound": {"description": "No identity has the supplied opaque ID.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}, "example": {"error": "identity not found"}}}},
+      "Conflict": {"description": "The typed source reference already belongs to another identity.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}, "example": {"error": "reference already belongs to another identity"}}}}
+    },
+    "schemas": {
+      "CreateEntity": {"type": "object", "additionalProperties": false, "required": ["kind"], "properties": {"kind": {"type": "string", "minLength": 1, "description": "Stable classification of the referent, not a mutable business attribute."}}},
+      "Entity": {"type": "object", "additionalProperties": false, "required": ["id", "kind", "created_at"], "properties": {"id": {"type": "string", "pattern": "^ent_[0-9a-f]{32}$", "readOnly": true, "description": "Opaque conserved ICMN identity."}, "kind": {"type": "string"}, "created_at": {"$ref": "#/components/schemas/UTCTimestamp"}, "references": {"type": "array", "items": {"$ref": "#/components/schemas/ExternalReference"}}, "assertions": {"type": "array", "description": "Contextual assertions coexist; array order grants no assertion authority.", "items": {"$ref": "#/components/schemas/Assertion"}}}},
+      "ExternalReference": {"type": "object", "additionalProperties": false, "required": ["source_system", "object_type", "source_key"], "properties": {"source_system": {"type": "string", "minLength": 1}, "object_type": {"type": "string", "minLength": 1}, "source_key": {"type": "string", "minLength": 1}, "uri": {"type": "string", "format": "uri", "description": "Address only; returning or storing it does not authorize dereferencing."}, "observed_at": {"allOf": [{"$ref": "#/components/schemas/UTCTimestamp"}], "description": "Observation time. Generated by the service when omitted."}}},
+      "Assertion": {"type": "object", "additionalProperties": false, "required": ["domain", "predicate", "value", "provenance"], "properties": {"id": {"type": "string", "pattern": "^ast_[0-9a-f]{32}$", "readOnly": true}, "domain": {"type": "string", "minLength": 1}, "predicate": {"type": "string", "minLength": 1}, "value": {"description": "Structured JSON value owned and interpreted in the named domain"}, "valid_from": {"allOf": [{"$ref": "#/components/schemas/UTCTimestamp"}], "description": "Start of domain validity; defaults to recording time when omitted."}, "valid_to": {"allOf": [{"$ref": "#/components/schemas/UTCTimestamp"}], "description": "Optional end of domain validity."}, "provenance": {"$ref": "#/components/schemas/Provenance"}, "recorded_at": {"allOf": [{"$ref": "#/components/schemas/UTCTimestamp"}], "readOnly": true, "description": "Server recording time."}}},
+      "Provenance": {"type": "object", "additionalProperties": false, "required": ["source"], "properties": {"source": {"type": "string", "minLength": 1}, "actor": {"type": "string"}, "method": {"type": "string"}}},
+      "Error": {"type": "object", "additionalProperties": false, "required": ["error"], "properties": {"error": {"type": "string", "description": "Human-readable error detail; clients should use the HTTP status for classification."}}},
+      "UTCTimestamp": {"type": "string", "format": "date-time", "pattern": "Z$", "description": "RFC 3339 timestamp normalized to UTC (Z).", "examples": ["2026-09-09T10:00:00Z"]}
+    }
+  }
+}
