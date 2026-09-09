@@ -1,0 +1,11 @@
+/bin/
+/dist/
+*.log
+*.out
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.pdf
+.idea/
+.vscode/
+.DS_Store
