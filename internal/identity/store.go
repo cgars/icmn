@@ -76,6 +76,8 @@ func (s *MemoryStore) AddReference(_ context.Context, id string, ref ExternalRef
 	}
 	if ref.ObservedAt.IsZero() {
 		ref.ObservedAt = s.now().UTC()
+	} else {
+		ref.ObservedAt = ref.ObservedAt.UTC()
 	}
 	s.references[key] = id
 	e.References = append(e.References, ref)
@@ -98,6 +100,12 @@ func (s *MemoryStore) AddAssertion(_ context.Context, id string, assertion Asser
 	assertion.RecordedAt = now
 	if assertion.ValidFrom.IsZero() {
 		assertion.ValidFrom = now
+	} else {
+		assertion.ValidFrom = assertion.ValidFrom.UTC()
+	}
+	if assertion.ValidTo != nil {
+		validTo := assertion.ValidTo.UTC()
+		assertion.ValidTo = &validTo
 	}
 	e.Assertions = append(e.Assertions, assertion)
 	s.entities[id] = e

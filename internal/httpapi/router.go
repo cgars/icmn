@@ -3,6 +3,7 @@ package httpapi
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 
 	"github.com/cgars/icmn/internal/identity"
@@ -13,12 +14,20 @@ type API struct{ store identity.Store }
 func New(store identity.Store) http.Handler {
 	a := &API{store: store}
 	mux := http.NewServeMux()
+	registerRoutes(mux, a)
+	return mux
+}
+
+type routeRegistrar interface {
+	HandleFunc(string, func(http.ResponseWriter, *http.Request))
+}
+
+func registerRoutes(mux routeRegistrar, a *API) {
 	mux.HandleFunc("GET /healthz", a.health)
 	mux.HandleFunc("POST /v1/entities", a.createEntity)
 	mux.HandleFunc("GET /v1/entities/{id}", a.getEntity)
 	mux.HandleFunc("POST /v1/entities/{id}/references", a.addReference)
 	mux.HandleFunc("POST /v1/entities/{id}/assertions", a.addAssertion)
-	return mux
 }
 
 func (a *API) health(w http.ResponseWriter, _ *http.Request) {
@@ -62,6 +71,13 @@ func decode(w http.ResponseWriter, r *http.Request, dst any) bool {
 	dec := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1<<20))
 	dec.DisallowUnknownFields()
 	if err := dec.Decode(dst); err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON: " + err.Error()})
+		return false
+	}
+	if err := dec.Decode(&struct{}{}); !errors.Is(err, io.EOF) {
+		if err == nil {
+			err = errors.New("request body must contain exactly one JSON value")
+		}
 		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON: " + err.Error()})
 		return false
 	}

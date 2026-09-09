@@ -39,7 +39,8 @@ The initial in-memory adapter proves behavior. Persistence should be implemented
 The hand-maintained OpenAPI 3.1 contract at [`api/openapi.json`](../api/openapi.json)
 is the executable description of the current public boundary. Black-box transport
 tests exercise the exported handler, while a contract drift test checks that every
-registered route and method remains represented in the document.
+route and method passed through the HTTP transport's single registration function
+remains represented in the document.
 
 ### API compatibility
 
