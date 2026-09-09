@@ -11,7 +11,7 @@ type Entity struct {
 	Kind       string              `json:"kind"`
 	CreatedAt  time.Time           `json:"created_at"`
 	References []ExternalReference `json:"references,omitempty"`
-	Assertions  []Assertion         `json:"assertions,omitempty"`
+	Assertions []Assertion         `json:"assertions,omitempty"`
 }
 
 // ExternalReference points to a representation managed outside ICMN.
