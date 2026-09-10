@@ -106,16 +106,6 @@ Authentication is not authorization. The database must not be able to silently r
 | TM-17 | Backups expose graph data or restore stale policy, missing links, or incomplete history. | I/T/D | High | Encrypted restricted backups; integrity manifest; point-in-time recovery; isolated restore; separate secrets. | Scheduled restore and invariant reconciliation. |
 | TM-18 | Privacy deletion silently mutates history, or retained links enable re-identification. | I/T/R | High | Classification/minimization; purpose/retention rules; explicit tombstone/redaction events; unlink workflow; privacy impact assessment. | Data-subject workflow and residual-link review. |
 
-### Implemented controls
-
-- **TM-13 (partial):** every current JSON command endpoint rejects request bodies
-  larger than 1 MiB and requires exactly one complete JSON value, with only
-  trailing whitespace permitted inside that limit. Black-box tests cover every
-  registered POST endpoint and verify that rejected bodies do not reach a store
-  mutation. Depth limits, quotas, timeouts, concurrency controls, and broader load
-  and fuzz verification remain release-gate work, so the inherent High rating is
-  unchanged.
-
 ## Security invariants
 
 - Matching creates proposals only; it never creates merge decisions.
