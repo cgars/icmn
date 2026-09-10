@@ -118,6 +118,16 @@ This catalogue covers the planned system, including features not implemented yet
 | TM-17 | Someone steals our spare copy, or restoring it brings back old permissions and an incomplete version of what happened. | Backups expose graph data or restore stale policy, missing links, or incomplete history. | I/T/D | High | Encrypted restricted backups; integrity manifest; point-in-time recovery; isolated restore; separate secrets. | Scheduled restore and invariant reconciliation. |
 | TM-18 | We remove someone's name, but the remaining connections reveal who they are, or we erase so much history that changes cannot be explained. | Privacy deletion silently mutates history, or retained links enable re-identification. | I/T/R | High | Classification/minimization; purpose/retention rules; explicit tombstone/redaction events; unlink workflow; privacy impact assessment. | Data-subject workflow and residual-link review. |
 
+## Implemented controls
+
+### TM-13 — partial request-body protection
+
+The HTTP decoder enforces the 1 MiB limit across the complete request body and accepts exactly one JSON value followed only by whitespace and EOF. Invalid bodies return a 400 JSON error before store mutation. Regression tests cover trailing garbage, additional JSON values, over-limit whitespace, valid whitespace, and absence of mutations across all POST endpoints.
+
+**ELI5:** We check the whole envelope, not just the first page. If it is too big or has extra instructions after the message, we reject it before changing the records.
+
+TM-13 remains **High** (inherent risk). This implements part of the required controls; it does not establish a lower residual rating. Depth limits, rate limits, bounded queries, timeouts/cancellation, concurrency limits, and backpressure still require implementation or verification as the relevant capabilities are added.
+
 ## Security invariants
 
 - Matching creates proposals only; it never creates merge decisions.

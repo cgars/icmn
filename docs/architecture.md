@@ -42,6 +42,22 @@ The initial in-memory adapter proves behavior. Persistence should be implemented
 - Add idempotency keys before production ingestion.
 - Never expose connector credentials or raw protected source payloads.
 
+The hand-maintained OpenAPI 3.1 contract at [`api/openapi.json`](../api/openapi.json)
+is the executable description of the current public boundary. Black-box transport
+tests exercise the exported handler, while a contract drift test checks that every
+route and method passed through the HTTP transport's single registration function
+remains represented in the document.
+
+### API compatibility
+
+- Additive routes, optional fields, and response variants may be introduced when
+  existing clients can continue to interpret the response safely.
+- Released fields and their meanings are not silently removed or repurposed.
+- A breaking transport or semantic change requires a new API version.
+- Domain evolution belongs in versioned assertions and schemas; it must not mutate
+  the semantics of the conserved identity or turn a contextual assertion into a
+  universal attribute.
+
 ## Security baseline
 
 Authentication and tenant isolation are required before multi-user deployment. Authorization must consider action, entity kind, domain, assertion predicate, and source system. Audit records must be append-only and redactable only through a separately recorded privacy operation.

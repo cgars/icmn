@@ -9,7 +9,7 @@ The roadmap is ordered by risk reduction, not feature count.
 - [x] typed external references
 - [x] domain assertions with provenance
 - [x] tests for reference uniqueness and semantic coexistence
-- [ ] API contract and integration test suite
+- [x] API contract and integration test suite
 
 ## Milestone 1 — durable registry
 
