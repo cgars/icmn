@@ -2,6 +2,12 @@
 
 ICMN begins as a modular monolith in Go. Clear internal boundaries preserve the option to separate workloads later without paying distributed-systems costs on day one.
 
+## ELI5
+
+ICMN keeps a map connecting cards about the same person or company. The cards can stay with their owners. Separate parts look after the map, each owner's statements, and the diary of decisions. A helper may fetch a card only when it has permission; knowing its address is not permission to open it.
+
+This describes the target architecture. The current seed provides an in-memory identity/reference/assertion API; matching, governed decisions, durable audit, connectors, and the steward UI remain planned. See [the ELI5 guide](eli5.md) for examples of each concept.
+
 ## Core model
 
 | Concept | Purpose | Ownership |

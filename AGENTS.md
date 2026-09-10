@@ -55,6 +55,21 @@ This runs formatting verification, vetting, and all tests. Add focused tests for
 - Every material pull request must state: **architecture impact**, **threat-model impact**, and **diagram impact**. “None” requires a short justification.
 - A security-sensitive feature is incomplete if its documentation and verification requirement remain stale, even when its functional tests pass.
 
+## ELI5 explanations
+
+Explain important concepts as if to a curious five-year-old: use familiar words, concrete examples, and simple comparisons. Keep the tone friendly without talking down to the reader.
+
+- Add an **ELI5** explanation where misunderstanding could affect an architectural, security, or user decision.
+- Use an **ELI5 column** in the threat catalogue and short **ELI5 sections** in conceptual documentation.
+- Cover identity, references, assertions, matching/confidence, merge/split, semantic contracts, authorization, time/provenance, architecture, and release gates where relevant.
+- In ADRs, include a short ELI5 explanation of the choice and its practical consequences.
+- For consequential UI actions, explain what will change, what will be preserved, affected consumers where known, and any limits to reversal before the user confirms.
+- Simplify the language, not the truth. Preserve important distinctions and explain the limits of comparisons.
+- Keep explanations synchronized with implementation; explicitly distinguish planned behavior from existing capabilities. A similarity score must not be described as a probability unless it is calibrated as one.
+- Add explanations where they help; do not mechanically duplicate every paragraph. Keep the technical detail beside them or link to it.
+
+A reader should understand the consequence before needing to understand the mechanism. See [the ELI5 guide](docs/eli5.md) for examples.
+
 ## Commit scope
 
 Keep commits reviewable and avoid mixing architectural refactors with features. Do not rewrite the paper merely to match an implementation shortcut; record deliberate changes to the conceptual model in an ADR.

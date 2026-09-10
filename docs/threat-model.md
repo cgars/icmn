@@ -85,26 +85,38 @@ Authentication is not authorization. The database must not be able to silently r
 
 ## Threat register
 
-| ID | Threat and abuse case | STRIDE | Risk | Required controls | Verification |
-|---|---|---|---|---|---|
-| TM-01 | Poisoned identifiers/evidence cause different subjects to be proposed or merged. | T | Critical | Provenance; versioned normalization; proposal-only automation; negative evidence; explained confidence; steward approval; safe split. | Adversarial corpus; false-merge tests; merge/split round trip. |
-| TM-02 | A compromised steward, replay, or confused deputy performs an unauthorized merge/split. | S/T/E | Critical | Deny-by-default action policy; separation of duties; step-up for decisions; idempotency; CSRF defense; immutable actor/reason. | Authorization matrix; replay and CSRF tests. |
-| TM-03 | Data crosses tenant, domain, predicate, or source-system boundaries. | I/E | Critical | No tenancy claim before isolation; tenant-scoped storage/queries; centralized policy on every request; database enforcement where useful. | Negative isolation tests for every route/job/cache/export. |
-| TM-04 | A typed reference is raced, duplicated, ambiguously normalized, or reassigned. | T | Critical | Transactional uniqueness; explicit lifecycle; canonical tuple; optimistic concurrency; idempotent commands. | Concurrent writes and normalization collision corpus. |
-| TM-05 | Assertions are forged, backdated, overwritten, or attributed to the wrong domain. | T/R | High | Append-only revisions; domain authorization; server-recorded time; validity separate from recording time; authenticated producer. | Tamper, time, and provenance reconstruction tests. |
-| TM-06 | UI/API aggregation promotes one domain claim as universal truth or hides disagreement. | T/I | High | Domain always visible; no implicit winner; explicit conflicts; purpose-bound projections; provenance in UI/API. | Contradictory-assertion API/UI scenarios. |
-| TM-07 | Proposal, decision, or audit history is changed or removed. | T/R | Critical | Append-only events; restricted writer; monotonic sequence; external digest checkpoints; immutable backup; recorded redactions. | Tamper detection, restore, and reconciliation exercise. |
-| TM-08 | A reference URI makes a connector access metadata services, loopback, private networks, files, or malicious redirects. | S/I/E | Critical | Never fetch on display; connector capabilities; scheme/host/port allowlists; validate every DNS/redirect hop; block private ranges; egress firewall; strict limits. | SSRF tests covering redirects, rebinding, IPv6, encodings, and schemes. |
-| TM-09 | Connector credentials leak into records, errors, logs, traces, URLs, or source control. | I | Critical | External secret store; short-lived least-privilege tokens; no secrets in domain objects/URLs; central redaction; rotation. | Secret scanning; telemetry tests; rotation exercise. |
-| TM-10 | A connector/source discloses more fields than the caller may access. | I/E | High | Propagate purpose/policy context; per-connector identity; minimization; response filtering; isolation; no shared super-token. | Connector contract and least-privilege tests. |
-| TM-11 | Search/export/enumeration reconstructs the identity graph at scale. | I | Critical | Object/field authorization; purpose limits; rate limits; export approval; audited exports; anomaly detection. | Bulk enumeration and export abuse tests. |
-| TM-12 | IDs, errors, or timing reveal whether an identity/source key exists. | I | Medium | Opaque random IDs; authorized search; disclosure-safe errors; rate limits; minimal identifiers in logs. | Enumeration and timing tests. |
-| TM-13 | Large JSON, expensive matching/search, connector delay, or event backlog exhausts resources. | D | High | Size/depth limits; bounded queries; pagination; quotas; timeouts/cancellation; concurrency limits; backpressure. | Load, fuzz, cancellation, and degraded-source tests. |
-| TM-14 | Hostile source/assertion content executes in a browser or forges a steward action. | S/T/E | High | Contextual encoding; strict CSP; no raw source HTML; secure cookies; CSRF protection; no state changes by GET; decision reauthorization. | XSS corpus, CSP/security-header and CSRF tests. |
-| TM-15 | Commands or outbox events are replayed, reordered, forged, or processed twice. | T/R/D | High | Transactional outbox; immutable event ID/version; idempotent consumers; ordering; authenticated transport; quarantine. | Duplicate/reorder/restart tests and reconciliation. |
-| TM-16 | A dependency, action, migration, or container compromises a release. | T/E | High | Minimize dependencies; immutable action pins before release; review/scanning; SBOM; reproducible signed builds/images. | CI supply-chain checks and clean rebuild comparison. |
-| TM-17 | Backups expose graph data or restore stale policy, missing links, or incomplete history. | I/T/D | High | Encrypted restricted backups; integrity manifest; point-in-time recovery; isolated restore; separate secrets. | Scheduled restore and invariant reconciliation. |
-| TM-18 | Privacy deletion silently mutates history, or retained links enable re-identification. | I/T/R | High | Classification/minimization; purpose/retention rules; explicit tombstone/redaction events; unlink workflow; privacy impact assessment. | Data-subject workflow and residual-link review. |
+### ELI5
+
+Think of ICMN as a book connecting cards from different places: "These cards describe the same person or company." Each place keeps its own statements. We must protect the cards, the connections, and the diary showing who changed them.
+
+This catalogue covers the planned system, including features not implemented yet. A critical connector risk does not mean the seed already has a vulnerable connector. Ratings describe inherent risk before planned protections, not confirmed incidents or proof that controls exist.
+
+- **STRIDE:** categories of trouble: pretending to be someone (S), changing things improperly (T), denying responsibility (R), revealing secrets (I), blocking service (D), or gaining extra powers (E).
+- **Risk:** how serious we consider the threat before the planned protections.
+- **Required controls:** what we must build or enforce to prevent it or limit damage.
+- **Verification:** how we check that those protections work.
+
+
+| ID | ELI5 | Threat and abuse case | STRIDE | Risk | Required controls | Verification |
+|---|---|---|---|---|---|---|
+| TM-01 | Someone changes the clues so we mistakenly decide that two different people are the same person. | Poisoned identifiers/evidence cause different subjects to be proposed or merged. | T | Critical | Provenance; versioned normalization; proposal-only automation; negative evidence; explained confidence; steward approval; safe split. | Adversarial corpus; false-merge tests; merge/split round trip. |
+| TM-02 | Someone joins or separates records without permission, perhaps by tricking someone who does have permission. | A compromised steward, replay, or confused deputy performs an unauthorized merge/split. | S/T/E | Critical | Deny-by-default action policy; separation of duties; step-up for decisions; idempotency; CSRF defense; immutable actor/reason. | Authorization matrix; replay and CSRF tests. |
+| TM-03 | Someone opens their own drawer of records and can also see or change records in somebody else's locked drawer. | Data crosses tenant, domain, predicate, or source-system boundaries. | I/E | Critical | No tenancy claim before isolation; tenant-scoped storage/queries; centralized policy on every request; database enforcement where useful. | Negative isolation tests for every route/job/cache/export. |
+| TM-04 | The same source card gets attached to two different people, or moved to the wrong person when two updates happen together. | A typed reference is raced, duplicated, ambiguously normalized, or reassigned. | T | Critical | Transactional uniqueness; explicit lifecycle; canonical tuple; optimistic concurrency; idempotent commands. | Concurrent writes and normalization collision corpus. |
+| TM-05 | Someone writes "Finance said this yesterday," although Finance never said it, or it was only written today. | Assertions are forged, backdated, overwritten, or attributed to the wrong domain. | T/R | High | Append-only revisions; domain authorization; server-recorded time; validity separate from recording time; authenticated producer. | Tamper, time, and provenance reconstruction tests. |
+| TM-06 | Sales says "This is a great customer." The screen presents that as everybody’s verdict and hides Finance saying "They have not paid." | UI/API aggregation promotes one domain claim as universal truth or hides disagreement. | T/I | High | Domain always visible; no implicit winner; explicit conflicts; purpose-bound projections; provenance in UI/API. | Contradictory-assertion API/UI scenarios. |
+| TM-07 | Someone changes records and then erases or rewrites the diary that would show what they did. | Proposal, decision, or audit history is changed or removed. | T/R | Critical | Append-only events; restricted writer; monotonic sequence; external digest checkpoints; immutable backup; recorded redactions. | Tamper detection, restore, and reconciliation exercise. |
+| TM-08 | Someone gives our helper a link that tricks it into opening a private door and bringing back what is inside. | A reference URI makes a connector access metadata services, loopback, private networks, files, or malicious redirects. | S/I/E | Critical | Never fetch on display; connector capabilities; scheme/host/port allowlists; validate every DNS/redirect hop; block private ranges; egress firewall; strict limits. | SSRF tests covering redirects, rebinding, IPv6, encodings, and schemes. |
+| TM-09 | We accidentally write the keys to another system into a message, log, or file that other people can read. | Connector credentials leak into records, errors, logs, traces, URLs, or source control. | I | Critical | External secret store; short-lived least-privilege tokens; no secrets in domain objects/URLs; central redaction; rotation. | Secret scanning; telemetry tests; rotation exercise. |
+| TM-10 | You may ask for someone's name, but our helper brings back their entire private folder. | A connector/source discloses more fields than the caller may access. | I/E | High | Propagate purpose/policy context; per-connector identity; minimization; response filtering; isolation; no shared super-token. | Connector contract and least-privilege tests. |
+| TM-11 | Someone collects enough records to reconstruct the whole map of who is connected to what. | Search/export/enumeration reconstructs the identity graph at scale. | I | Critical | Object/field authorization; purpose limits; rate limits; export approval; audited exports; anomaly detection. | Bulk enumeration and export abuse tests. |
+| TM-12 | Even when we hide a record, our answer, or how quickly we answer, gives away that it exists. | IDs, errors, or timing reveal whether an identity/source key exists. | I | Medium | Opaque random IDs; authorized search; disclosure-safe errors; rate limits; minimal identifiers in logs. | Enumeration and timing tests. |
+| TM-13 | Someone gives the system so much work, or work that takes so long, that it cannot help anyone else. | Large JSON, expensive matching/search, connector delay, or event backlog exhausts resources. | D | High | Size/depth limits; bounded queries; pagination; quotas; timeouts/cancellation; concurrency limits; backpressure. | Load, fuzz, cancellation, and degraded-source tests. |
+| TM-14 | A piece of text looks harmless but makes the browser run instructions or tricks a user into approving something. | Hostile source/assertion content executes in a browser or forges a steward action. | S/T/E | High | Contextual encoding; strict CSP; no raw source HTML; secure cookies; CSRF protection; no state changes by GET; decision reauthorization. | XSS corpus, CSP/security-header and CSRF tests. |
+| TM-15 | "Do this once" arrives twice, or instructions arrive in the wrong order, and the system makes the wrong changes. | Commands or outbox events are replayed, reordered, forged, or processed twice. | T/R/D | High | Transactional outbox; immutable event ID/version; idempotent consumers; ordering; authenticated transport; quarantine. | Duplicate/reorder/restart tests and reconciliation. |
+| TM-16 | A tool or ingredient used to build the application has been secretly altered, so the application contains something harmful. | A dependency, action, migration, or container compromises a release. | T/E | High | Minimize dependencies; immutable action pins before release; review/scanning; SBOM; reproducible signed builds/images. | CI supply-chain checks and clean rebuild comparison. |
+| TM-17 | Someone steals our spare copy, or restoring it brings back old permissions and an incomplete version of what happened. | Backups expose graph data or restore stale policy, missing links, or incomplete history. | I/T/D | High | Encrypted restricted backups; integrity manifest; point-in-time recovery; isolated restore; separate secrets. | Scheduled restore and invariant reconciliation. |
+| TM-18 | We remove someone's name, but the remaining connections reveal who they are, or we erase so much history that changes cannot be explained. | Privacy deletion silently mutates history, or retained links enable re-identification. | I/T/R | High | Classification/minimization; purpose/retention rules; explicit tombstone/redaction events; unlink workflow; privacy impact assessment. | Data-subject workflow and residual-link review. |
 
 ## Security invariants
 
@@ -120,6 +132,18 @@ Authentication is not authorization. The database must not be able to silently r
 - Multi-tenancy is unsupported until every boundary is negatively isolation-tested.
 
 ## Release gates
+
+### ELI5
+
+These are the checks before we open another door:
+
+- **Shared deployment:** check who may enter, what they may do, and whether we can recover after trouble.
+- **Merge/split:** check who may connect or separate cards, keep the diary, and practice undoing a wrong decision.
+- **Connectors:** give each helper only the keys it needs and check which doors it may open.
+- **Multi-tenancy:** prove that one organization's locked drawer stays closed to every other organization.
+
+A missing check means the corresponding capability is not ready for the deployment claimed. The lists below define the actual gates; these comparisons do not replace them.
+
 
 ### Before shared or network-accessible deployment
 

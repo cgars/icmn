@@ -4,6 +4,12 @@ Thank you for helping build ICMN.
 
 Before opening a large change, create an issue describing the user problem, the domain invariant involved, and the smallest useful vertical slice. Architectural changes should include a short ADR under `docs/adr/`.
 
+## ELI5
+
+Explain your change as if to a curious five-year-old: what will happen, why it helps, and what could go wrong. Keep the precise technical explanation too. Follow the [ELI5 working agreement](AGENTS.md#eli5-explanations) and update existing explanations when behavior changes.
+
+ADRs should include an ELI5 explanation of the decision and what it means in practice. User-facing confirmations should explain consequences and limits to reversal using the behavior actually implemented.
+
 ## Development
 
 ```bash

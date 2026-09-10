@@ -12,6 +12,12 @@ The project intentionally separates three things that conventional MDM often col
 
 ![ICMN architecture: a conserved identity plane connected to negotiated domain meaning through provenance and governed references](docs/architecture/icmn-architecture.svg)
 
+## ELI5
+
+Imagine Sales and Finance each have a card about the same company. Sales writes, "We like working with them." Finance writes, "They have not paid." ICMN connects the cards so we know who they mean, while keeping who said what visible. Connecting the cards does not make either statement everybody's answer.
+
+The picture above shows the intended architecture, including parts still to be built. The current seed creates identities and attaches references and assertions in memory. Read [ICMN explained like you are five](docs/eli5.md) for the concepts and their limits.
+
 ## Status
 
 This repository is at the architectural seed stage. The initial Go service is deliberately small but executable. It demonstrates the core model and gives contributors and coding agents a tested foundation rather than a speculative framework.
