@@ -30,6 +30,13 @@ func TestHealth(t *testing.T) {
 	}
 }
 
+func TestEmptyEntityListIsJSONArray(t *testing.T) {
+	res := request(t, httpapi.New(identity.NewMemoryStore()), http.MethodGet, "/v1/entities", nil)
+	if res.Code != http.StatusOK || !strings.Contains(res.Body.String(), `"items":[]`) {
+		t.Fatalf("status=%d body=%s, want items array", res.Code, res.Body.String())
+	}
+}
+
 func TestCreateAndRetrieveEntity(t *testing.T) {
 	h := httpapi.New(identity.NewMemoryStore())
 	created := createEntity(t, h, "organization")

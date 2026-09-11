@@ -17,7 +17,7 @@ The roadmap is ordered by risk reduction, not feature count.
 - [x] idempotent write commands
 - [x] append-only audit events and transactional outbox
 - [x] pagination and query by external reference
-- [x] containerized local development
+- [ ] containerized local development (Compose smoke verification runs in CI; completion awaits a passing clean-image run)
 - OpenTelemetry traces and structured metrics
 
 ## Milestone 2 — resolution

@@ -22,6 +22,20 @@ func TestReferencesAreUniqueAcrossIdentities(t *testing.T) {
 	}
 }
 
+func TestReattachingReferenceToSameIdentityIsANoOp(t *testing.T) {
+	s := NewMemoryStore()
+	e, _ := s.Create(context.Background(), CreateEntity{Kind: "organization"})
+	ref := ExternalReference{SourceSystem: "crm", ObjectType: "account", SourceKey: "42"}
+	first, err := s.AddReference(context.Background(), e.ID, ref)
+	if err != nil {
+		t.Fatal(err)
+	}
+	again, err := s.AddReference(context.Background(), e.ID, ref)
+	if err != nil || len(again.References) != 1 || again.References[0].ObservedAt != first.References[0].ObservedAt {
+		t.Fatalf("reattach=%+v err=%v", again, err)
+	}
+}
+
 func TestConflictingAssertionsCanCoexist(t *testing.T) {
 	ctx := context.Background()
 	s := NewMemoryStore()

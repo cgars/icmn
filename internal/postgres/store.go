@@ -58,14 +58,28 @@ func (s *Store) AddReference(ctx context.Context, id string, ref identity.Extern
 	if strings.TrimSpace(ref.SourceSystem) == "" || strings.TrimSpace(ref.ObjectType) == "" || strings.TrimSpace(ref.SourceKey) == "" {
 		return identity.Entity{}, fmt.Errorf("%w: source_system, object_type, and source_key are required", identity.ErrInvalid)
 	}
+	input := ref
 	if ref.ObservedAt.IsZero() {
 		ref.ObservedAt = s.now().UTC()
 	} else {
 		ref.ObservedAt = ref.ObservedAt.UTC()
 	}
-	return command(s, ctx, "add_reference:"+id, ref, func(tx *sql.Tx) (identity.Entity, error) {
-		if _, err := tx.ExecContext(ctx, `INSERT INTO external_references(entity_id,source_system,object_type,source_key,uri,observed_at) VALUES($1,$2,$3,$4,$5,$6)`, id, ref.SourceSystem, ref.ObjectType, ref.SourceKey, ref.URI, ref.ObservedAt); err != nil {
+	return command(s, ctx, "add_reference:"+id, input, func(tx *sql.Tx) (identity.Entity, error) {
+		result, err := tx.ExecContext(ctx, `INSERT INTO external_references(entity_id,source_system,object_type,source_key,uri,observed_at) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT (source_system,object_type,source_key) DO NOTHING`, id, ref.SourceSystem, ref.ObjectType, ref.SourceKey, ref.URI, ref.ObservedAt)
+		if err != nil {
 			return identity.Entity{}, mapError(err)
+		}
+		if inserted, err := result.RowsAffected(); err != nil {
+			return identity.Entity{}, err
+		} else if inserted == 0 {
+			var owner string
+			if err := tx.QueryRowContext(ctx, `SELECT entity_id FROM external_references WHERE source_system=$1 AND object_type=$2 AND source_key=$3`, ref.SourceSystem, ref.ObjectType, ref.SourceKey).Scan(&owner); err != nil {
+				return identity.Entity{}, err
+			}
+			if owner != id {
+				return identity.Entity{}, identity.ErrConflict
+			}
+			return get(ctx, tx, id)
 		}
 		e, err := get(ctx, tx, id)
 		if err != nil {
@@ -78,6 +92,7 @@ func (s *Store) AddAssertion(ctx context.Context, id string, a identity.Assertio
 	if strings.TrimSpace(a.Domain) == "" || strings.TrimSpace(a.Predicate) == "" || len(a.Value) == 0 || strings.TrimSpace(a.Provenance.Source) == "" {
 		return identity.Entity{}, fmt.Errorf("%w: domain, predicate, value, and provenance.source are required", identity.ErrInvalid)
 	}
+	input := a
 	now := s.now().UTC()
 	a.ID = newID("ast")
 	a.RecordedAt = now
@@ -91,7 +106,7 @@ func (s *Store) AddAssertion(ctx context.Context, id string, a identity.Assertio
 		a.ValidTo = &v
 	}
 	p, _ := json.Marshal(a.Provenance)
-	return command(s, ctx, "add_assertion:"+id, a, func(tx *sql.Tx) (identity.Entity, error) {
+	return command(s, ctx, "add_assertion:"+id, input, func(tx *sql.Tx) (identity.Entity, error) {
 		if _, err := tx.ExecContext(ctx, `INSERT INTO assertions(id,entity_id,domain,predicate,value,valid_from,valid_to,provenance,recorded_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)`, a.ID, id, a.Domain, a.Predicate, []byte(a.Value), a.ValidFrom, a.ValidTo, p, a.RecordedAt); err != nil {
 			return identity.Entity{}, mapError(err)
 		}
@@ -120,32 +135,96 @@ func (s *Store) List(ctx context.Context, p identity.Page) (identity.EntityPage,
 	if p.Limit > 200 {
 		return identity.EntityPage{}, fmt.Errorf("%w: limit must not exceed 200", identity.ErrInvalid)
 	}
-	rows, err := s.db.QueryContext(ctx, `SELECT id FROM entities WHERE id>$1 ORDER BY id LIMIT $2`, p.After, p.Limit+1)
+	rows, err := s.db.QueryContext(ctx, `SELECT id,kind,created_at FROM entities WHERE id>$1 ORDER BY id LIMIT $2`, p.After, p.Limit+1)
 	if err != nil {
 		return identity.EntityPage{}, err
 	}
 	defer rows.Close()
-	var ids []string
+	ids := make([]string, 0)
+	entities := make(map[string]identity.Entity, p.Limit)
 	for rows.Next() {
-		var id string
-		if err := rows.Scan(&id); err != nil {
+		var e identity.Entity
+		if err := rows.Scan(&e.ID, &e.Kind, &e.CreatedAt); err != nil {
 			return identity.EntityPage{}, err
 		}
-		ids = append(ids, id)
+		e.CreatedAt = e.CreatedAt.UTC()
+		ids = append(ids, e.ID)
+		entities[e.ID] = e
 	}
-	out := identity.EntityPage{}
+	if err := rows.Err(); err != nil {
+		return identity.EntityPage{}, err
+	}
+	out := identity.EntityPage{Items: make([]identity.Entity, 0, min(len(ids), p.Limit))}
 	if len(ids) > p.Limit {
 		ids = ids[:p.Limit]
 		out.NextCursor = ids[len(ids)-1]
 	}
-	for _, id := range ids {
-		e, err := s.Get(ctx, id)
-		if err != nil {
+	if len(ids) == 0 {
+		return out, nil
+	}
+	args := make([]any, len(ids))
+	holders := make([]string, len(ids))
+	for i, id := range ids {
+		args[i] = id
+		holders[i] = fmt.Sprintf("$%d", i+1)
+	}
+	referenceRows, err := s.db.QueryContext(ctx, `SELECT entity_id,source_system,object_type,source_key,uri,observed_at FROM external_references WHERE entity_id IN (`+strings.Join(holders, ",")+`) ORDER BY entity_id,source_system,object_type,source_key`, args...)
+	if err != nil {
+		return out, err
+	}
+	for referenceRows.Next() {
+		var (
+			entityID string
+			ref      identity.ExternalReference
+		)
+		if err := referenceRows.Scan(&entityID, &ref.SourceSystem, &ref.ObjectType, &ref.SourceKey, &ref.URI, &ref.ObservedAt); err != nil {
+			referenceRows.Close()
 			return out, err
 		}
-		out.Items = append(out.Items, e)
+		ref.ObservedAt = ref.ObservedAt.UTC()
+		e := entities[entityID]
+		e.References = append(e.References, ref)
+		entities[entityID] = e
 	}
-	return out, rows.Err()
+	if err := referenceRows.Err(); err != nil {
+		referenceRows.Close()
+		return out, err
+	}
+	referenceRows.Close()
+	assertionRows, err := s.db.QueryContext(ctx, `SELECT entity_id,id,domain,predicate,value,valid_from,valid_to,provenance,recorded_at FROM assertions WHERE entity_id IN (`+strings.Join(holders, ",")+`) ORDER BY entity_id,recorded_at,id`, args...)
+	if err != nil {
+		return out, err
+	}
+	defer assertionRows.Close()
+	for assertionRows.Next() {
+		var (
+			entityID string
+			a        identity.Assertion
+			p        []byte
+		)
+		if err := assertionRows.Scan(&entityID, &a.ID, &a.Domain, &a.Predicate, &a.Value, &a.ValidFrom, &a.ValidTo, &p, &a.RecordedAt); err != nil {
+			return out, err
+		}
+		if err := json.Unmarshal(p, &a.Provenance); err != nil {
+			return out, err
+		}
+		a.ValidFrom = a.ValidFrom.UTC()
+		a.RecordedAt = a.RecordedAt.UTC()
+		if a.ValidTo != nil {
+			v := a.ValidTo.UTC()
+			a.ValidTo = &v
+		}
+		e := entities[entityID]
+		e.Assertions = append(e.Assertions, a)
+		entities[entityID] = e
+	}
+	if err := assertionRows.Err(); err != nil {
+		return out, err
+	}
+	for _, id := range ids {
+		out.Items = append(out.Items, entities[id])
+	}
+	return out, nil
 }
 
 type queryer interface {
@@ -186,7 +265,9 @@ func get(ctx context.Context, q queryer, id string) (identity.Entity, error) {
 		if err := ar.Scan(&a.ID, &a.Domain, &a.Predicate, &a.Value, &a.ValidFrom, &a.ValidTo, &p, &a.RecordedAt); err != nil {
 			return e, err
 		}
-		json.Unmarshal(p, &a.Provenance)
+		if err := json.Unmarshal(p, &a.Provenance); err != nil {
+			return e, err
+		}
 		a.ValidFrom = a.ValidFrom.UTC()
 		a.RecordedAt = a.RecordedAt.UTC()
 		if a.ValidTo != nil {
