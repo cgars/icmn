@@ -227,3 +227,11 @@ Update this assessment whenever a trust boundary, actor, data class, connector c
 - [OWASP Authorization Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html)
 - [OWASP SSRF Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html)
 - [OWASP CSRF Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html)
+
+## Phase 1 control assessment (2026-09-10)
+
+Phase 1 implements transactional typed-reference uniqueness, command replay/conflict semantics, database rollback consistency, loopback-only Compose publishing, and recoverable at-least-once outbox leasing. Audit entries are appended in the same transaction as changes, but they have no hash chain, signed checkpoint, immutable external copy, or privileged-operator protection. Accordingly this work partially controls TM-06 and TM-07 and does **not** claim tamper evidence or lower their residual rating. The prototype remains unauthenticated, single-tenant, and restricted to fictional local evaluation.
+
+### ELI5
+
+The notebook now saves a diary line and delivery note with each card change. Ordinary application actions do not erase old diary lines, but a powerful database operator could still rewrite the notebook. We have not added the wax seal that would reveal that rewrite.

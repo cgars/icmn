@@ -11,6 +11,19 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: icmn_test
+          POSTGRES_USER: icmn
+          POSTGRES_PASSWORD: test-only
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U icmn -d icmn_test"
+          --health-interval 2s --health-timeout 2s --health-retries 20
+    env:
+      ICMN_TEST_DATABASE_URL: postgres://icmn:test-only@127.0.0.1:5432/icmn_test?sslmode=disable
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v6

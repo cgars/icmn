@@ -2,7 +2,7 @@
 
 The roadmap is ordered by risk reduction, not feature count.
 
-## Milestone 0 — executable model (current)
+## Milestone 0 — executable model
 
 - [x] Go module and HTTP service
 - [x] conserved identity creation
@@ -13,11 +13,11 @@ The roadmap is ordered by risk reduction, not feature count.
 
 ## Milestone 1 — durable registry
 
-- PostgreSQL persistence and migrations
-- idempotent write commands
-- append-only audit events
-- pagination and query by external reference
-- containerized local development
+- [x] PostgreSQL persistence and migrations
+- [x] idempotent write commands
+- [x] append-only audit events and transactional outbox
+- [x] pagination and query by external reference
+- [x] containerized local development
 - OpenTelemetry traces and structured metrics
 
 ## Milestone 2 — resolution

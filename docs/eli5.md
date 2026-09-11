@@ -8,7 +8,7 @@ Imagine a book connecting cards about people or companies. Each card has an owne
 
 Sales and Finance can describe the same company differently. "A great customer" and "Has unpaid bills" can both be useful statements. Connecting their cards does not make either statement a universal answer.
 
-The seed creates identities and attaches typed references and assertions in memory. It does not yet provide the full versioned, durable platform.
+Phase 1 creates identities and attaches typed references and assertions either in memory or in a durable PostgreSQL notebook. It does not yet provide matching, merge/split, authorization, or the full production platform.
 
 ## Matching and confidence — planned
 
@@ -44,7 +44,7 @@ A statement received today may describe last week. Keep those times separate. Th
 
 ICMN keeps the map; source systems can keep their cards. A reference is an address, not a copy and not permission to fetch anything.
 
-The [architecture diagram](architecture.md) describes the target. The current seed is an in-memory Go API; the durable registry, connectors, matching, and steward interface are still planned.
+The [architecture diagram](architecture.md) describes the target. The current service has a durable PostgreSQL registry and transactional delivery notes; connectors, matching, governed decisions, and the steward interface are still planned.
 
 ## Steward actions — future UI guidance
 

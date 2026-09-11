@@ -1,10 +1,14 @@
-.PHONY: run test fmt vet check paper diagrams
+.PHONY: run test integration fmt vet check paper diagrams
 
 run:
 	go run ./cmd/icmn
 
 test:
 	go test ./...
+
+integration:
+	test -n "$$ICMN_TEST_DATABASE_URL"
+	go test -race ./internal/postgres
 
 fmt:
 	gofmt -w $$(find . -name '*.go' -type f)
