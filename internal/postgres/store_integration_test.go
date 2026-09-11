@@ -120,6 +120,48 @@ func TestIdempotencyAuditOutboxAndPagination(t *testing.T) {
 	}
 }
 
+func TestIdempotentReplayForReferenceAndAssertion(t *testing.T) {
+	s := testStore(t)
+	baseCtx := context.Background()
+	e, err := s.Create(baseCtx, identity.CreateEntity{Kind: "organization"})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	refCtx := identity.WithIdempotencyKey(baseCtx, "same-reference-command")
+	ref := identity.ExternalReference{SourceSystem: "crm", ObjectType: "account", SourceKey: "42"}
+	firstReference, err := s.AddReference(refCtx, e.ID, ref)
+	if err != nil {
+		t.Fatal(err)
+	}
+	replayedReference, err := s.AddReference(refCtx, e.ID, ref)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if replayedReference.ID != firstReference.ID || len(replayedReference.References) != len(firstReference.References) {
+		t.Fatalf("reference replay mismatch: first=%+v replay=%+v", firstReference, replayedReference)
+	}
+
+	assertionCtx := identity.WithIdempotencyKey(baseCtx, "same-assertion-command")
+	assertion := identity.Assertion{
+		Domain:     "finance",
+		Predicate:  "status",
+		Value:      json.RawMessage(`{"state":"due"}`),
+		Provenance: identity.Provenance{Source: "fictional-ledger"},
+	}
+	firstAssertion, err := s.AddAssertion(assertionCtx, e.ID, assertion)
+	if err != nil {
+		t.Fatal(err)
+	}
+	replayedAssertion, err := s.AddAssertion(assertionCtx, e.ID, assertion)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if replayedAssertion.ID != firstAssertion.ID || len(replayedAssertion.Assertions) != len(firstAssertion.Assertions) {
+		t.Fatalf("assertion replay mismatch: first=%+v replay=%+v", firstAssertion, replayedAssertion)
+	}
+}
+
 func TestFailedMutationRollsBackBusinessAuditAndOutbox(t *testing.T) {
 	s := testStore(t)
 	ctx := identity.WithIdempotencyKey(context.Background(), "missing-entity-command")
