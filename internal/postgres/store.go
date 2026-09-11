@@ -192,7 +192,9 @@ func (s *Store) List(ctx context.Context, p identity.Page) (identity.EntityPage,
 		if err := assertionRows.Scan(&entityID, &a.ID, &a.Domain, &a.Predicate, &a.Value, &a.ValidFrom, &a.ValidTo, &p, &a.RecordedAt); err != nil {
 			return out, err
 		}
-		json.Unmarshal(p, &a.Provenance)
+		if err := json.Unmarshal(p, &a.Provenance); err != nil {
+			return out, err
+		}
 		a.ValidFrom = a.ValidFrom.UTC()
 		a.RecordedAt = a.RecordedAt.UTC()
 		if a.ValidTo != nil {
@@ -250,7 +252,9 @@ func get(ctx context.Context, q queryer, id string) (identity.Entity, error) {
 		if err := ar.Scan(&a.ID, &a.Domain, &a.Predicate, &a.Value, &a.ValidFrom, &a.ValidTo, &p, &a.RecordedAt); err != nil {
 			return e, err
 		}
-		json.Unmarshal(p, &a.Provenance)
+		if err := json.Unmarshal(p, &a.Provenance); err != nil {
+			return e, err
+		}
 		a.ValidFrom = a.ValidFrom.UTC()
 		a.RecordedAt = a.RecordedAt.UTC()
 		if a.ValidTo != nil {
