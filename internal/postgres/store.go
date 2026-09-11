@@ -68,6 +68,18 @@ func (s *Store) AddReference(ctx context.Context, id string, ref identity.Extern
 		if _, err := tx.ExecContext(ctx, `INSERT INTO external_references(entity_id,source_system,object_type,source_key,uri,observed_at) VALUES($1,$2,$3,$4,$5,$6)`, id, ref.SourceSystem, ref.ObjectType, ref.SourceKey, ref.URI, ref.ObservedAt); err != nil {
 			return identity.Entity{}, mapError(err)
 		}
+		if inserted, err := result.RowsAffected(); err != nil {
+			return identity.Entity{}, err
+		} else if inserted == 0 {
+			var owner string
+			if err := tx.QueryRowContext(ctx, `SELECT entity_id FROM external_references WHERE source_system=$1 AND object_type=$2 AND source_key=$3`, ref.SourceSystem, ref.ObjectType, ref.SourceKey).Scan(&owner); err != nil {
+				return identity.Entity{}, err
+			}
+			if owner != id {
+				return identity.Entity{}, identity.ErrConflict
+			}
+			return get(ctx, tx, id)
+		}
 		e, err := get(ctx, tx, id)
 		if err != nil {
 			return e, err
@@ -141,7 +153,7 @@ func (s *Store) List(ctx context.Context, p identity.Page) (identity.EntityPage,
 	if err := rows.Err(); err != nil {
 		return identity.EntityPage{}, err
 	}
-	out := identity.EntityPage{}
+	out := identity.EntityPage{Items: make([]identity.Entity, 0, min(len(ids), p.Limit))}
 	if len(ids) > p.Limit {
 		ids = ids[:p.Limit]
 		out.NextCursor = ids[len(ids)-1]

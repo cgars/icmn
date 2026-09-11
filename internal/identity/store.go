@@ -107,6 +107,8 @@ func (s *MemoryStore) AddReference(ctx context.Context, id string, ref ExternalR
 	}
 	if owner, exists := s.references[key]; exists && owner != id {
 		return Entity{}, ErrConflict
+	} else if exists {
+		return clone(e), nil
 	}
 	if ref.ObservedAt.IsZero() {
 		ref.ObservedAt = s.now().UTC()
