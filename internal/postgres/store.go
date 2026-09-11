@@ -65,8 +65,7 @@ func (s *Store) AddReference(ctx context.Context, id string, ref identity.Extern
 		ref.ObservedAt = ref.ObservedAt.UTC()
 	}
 	return command(s, ctx, "add_reference:"+id, input, func(tx *sql.Tx) (identity.Entity, error) {
-		result, err := tx.ExecContext(ctx, `INSERT INTO external_references(entity_id,source_system,object_type,source_key,uri,observed_at) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT (source_system,object_type,source_key) DO NOTHING`, id, ref.SourceSystem, ref.ObjectType, ref.SourceKey, ref.URI, ref.ObservedAt)
-		if err != nil {
+		if _, err := tx.ExecContext(ctx, `INSERT INTO external_references(entity_id,source_system,object_type,source_key,uri,observed_at) VALUES($1,$2,$3,$4,$5,$6)`, id, ref.SourceSystem, ref.ObjectType, ref.SourceKey, ref.URI, ref.ObservedAt); err != nil {
 			return identity.Entity{}, mapError(err)
 		}
 		if inserted, err := result.RowsAffected(); err != nil {
@@ -140,7 +139,7 @@ func (s *Store) List(ctx context.Context, p identity.Page) (identity.EntityPage,
 		return identity.EntityPage{}, err
 	}
 	defer rows.Close()
-	ids := make([]string, 0)
+	var ids []string
 	entities := make(map[string]identity.Entity, p.Limit)
 	for rows.Next() {
 		var e identity.Entity
