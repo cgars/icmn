@@ -65,7 +65,8 @@ func (s *Store) AddReference(ctx context.Context, id string, ref identity.Extern
 		ref.ObservedAt = ref.ObservedAt.UTC()
 	}
 	return command(s, ctx, "add_reference:"+id, input, func(tx *sql.Tx) (identity.Entity, error) {
-		if _, err := tx.ExecContext(ctx, `INSERT INTO external_references(entity_id,source_system,object_type,source_key,uri,observed_at) VALUES($1,$2,$3,$4,$5,$6)`, id, ref.SourceSystem, ref.ObjectType, ref.SourceKey, ref.URI, ref.ObservedAt); err != nil {
+		result, err := tx.ExecContext(ctx, `INSERT INTO external_references(entity_id,source_system,object_type,source_key,uri,observed_at) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT (source_system,object_type,source_key) DO NOTHING`, id, ref.SourceSystem, ref.ObjectType, ref.SourceKey, ref.URI, ref.ObservedAt)
+		if err != nil {
 			return identity.Entity{}, mapError(err)
 		}
 		if inserted, err := result.RowsAffected(); err != nil {

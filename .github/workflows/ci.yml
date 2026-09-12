@@ -9,6 +9,19 @@ permissions:
   contents: read
 
 jobs:
+  architecture-diagram:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Render architecture PNG from Draw.io source
+        run: make diagram-png verify-diagram-png
+      - name: Upload architecture PNG
+        uses: actions/upload-artifact@v4
+        with:
+          name: icmn-architecture-png-${{ github.event.pull_request.head.sha || github.sha }}
+          path: build/architecture/icmn-architecture.png
+          if-no-files-found: error
+
   test:
     runs-on: ubuntu-latest
     services:
