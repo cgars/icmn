@@ -15,7 +15,7 @@ With the Draw.io desktop CLI installed:
 make diagrams
 ```
 
-CI renders the downloadable PNG with a digest-pinned Draw.io container and checks that the 2× bitmap is a readable 3200×2000 image. To reproduce that artifact locally, install Docker and run:
+CI renders the downloadable PNG with a digest-pinned Draw.io container and checks that the 2× bitmap is a readable 3200×2000 image. The container's headless renderer gets 120 seconds to start and export instead of its 10-second default, which is too short on a fresh CI runner. To reproduce that artifact locally, install Docker and run:
 
 ```bash
 make diagram-png verify-diagram-png
