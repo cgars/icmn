@@ -1,6 +1,6 @@
 # Architecture diagram assets
 
-The editable source of the primary architecture diagram is `icmn-architecture.drawio`. Its text-based SVG export is committed and used by the main README. The binary PNG is generated from the committed Draw.io source in GitHub Actions and uploaded as a workflow artifact tied to that run and commit; it is not committed.
+The editable source of the primary architecture diagram is `icmn-architecture.drawio`. Its text-based SVG export is committed and used by the main README. GitHub Actions rasterizes that SVG into a binary PNG and uploads it as a workflow artifact tied to the run and commit; the PNG is not committed.
 
 When a component, trust boundary, ownership boundary, or material data flow changes:
 
@@ -15,7 +15,7 @@ With the Draw.io desktop CLI installed:
 make diagrams
 ```
 
-CI renders the downloadable PNG with a digest-pinned Draw.io container and checks that the 2× bitmap is a readable 3200×2000 image. The container's headless renderer gets 120 seconds to start and export instead of its 10-second default, which is too short on a fresh CI runner. To reproduce that artifact locally, install Docker and run:
+CI rasterizes the same SVG used by the main README with a digest-pinned Inkscape container, then checks that the 2× bitmap is a readable 3200×2000 image. Using the committed SVG as the bitmap input avoids starting Draw.io's Electron desktop application on a headless CI runner. To reproduce that artifact locally, install Docker and run:
 
 ```bash
 make diagram-png verify-diagram-png

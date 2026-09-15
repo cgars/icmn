@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Render architecture PNG from Draw.io source
+      - name: Render architecture PNG from committed SVG
         run: make diagram-png verify-diagram-png
       - name: Upload architecture PNG
         uses: actions/upload-artifact@v4
