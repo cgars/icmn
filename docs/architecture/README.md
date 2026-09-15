@@ -1,14 +1,13 @@
 # Architecture diagram assets
 
-The editable source of the primary architecture diagram is `icmn-architecture.drawio`. The SVG and PNG files are rendered derivatives used by GitHub and other publications.
+The editable source of the primary architecture diagram is `icmn-architecture.drawio`. Its text-based SVG export is committed and used by the main README. GitHub Actions rasterizes that SVG into a binary PNG and uploads it as a workflow artifact tied to the run and commit; the PNG is not committed.
 
 When a component, trust boundary, ownership boundary, or material data flow changes:
 
 1. update the Draw.io source;
 2. export a new SVG with embedded fonts disabled;
-3. export a 2× PNG on a light background;
-4. verify both renderings visually;
-5. update `docs/architecture.md` and `docs/threat-model.md` when the change affects their claims.
+3. verify the SVG visually, including its labels, arrows, boundaries, and implemented/planned distinctions;
+4. update `docs/architecture.md` and `docs/threat-model.md` when the change affects their claims.
 
 With the Draw.io desktop CLI installed:
 
@@ -16,4 +15,12 @@ With the Draw.io desktop CLI installed:
 make diagrams
 ```
 
-Do not hand-edit the generated PNG. If the SVG requires a GitHub-specific accessibility correction, reproduce that correction in the Draw.io source where possible and document any unavoidable difference here.
+CI rasterizes the same SVG used by the main README with a digest-pinned Inkscape container, then checks that the 2× bitmap is a readable 3200×2000 image. Using the committed SVG as the bitmap input avoids starting Draw.io's Electron desktop application on a headless CI runner. To reproduce that artifact locally, install Docker and run:
+
+```bash
+make diagram-png verify-diagram-png
+```
+
+After a workflow completes, open its summary in GitHub Actions and download the `icmn-architecture-png-<commit SHA>` artifact. Visually inspect the PNG before relying on it in a publication. The automated size check catches missing, corrupt, or unexpectedly low-resolution output, but it cannot judge clipped text or misleading arrows.
+
+Do not hand-edit generated exports. If the SVG requires a GitHub-specific accessibility correction, reproduce that correction in the Draw.io source where possible and document any unavoidable difference here.

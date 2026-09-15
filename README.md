@@ -16,11 +16,11 @@ The project intentionally separates three things that conventional MDM often col
 
 Imagine Sales and Finance each have a card about the same company. Sales writes, "We like working with them." Finance writes, "They have not paid." ICMN connects the cards so we know who they mean, while keeping who said what visible. Connecting the cards does not make either statement everybody's answer.
 
-The picture above shows the intended architecture, including parts still to be built. The current seed creates identities and attaches references and assertions in memory. Read [ICMN explained like you are five](docs/eli5.md) for the concepts and their limits.
+The picture above shows the intended architecture, including parts still to be built. The current Phase 1 service durably stores identities, references, assertions, audit events, and delivery notes when PostgreSQL is configured; an in-memory adapter remains available. Read [ICMN explained like you are five](docs/eli5.md) for the concepts and their limits.
 
 ## Status
 
-This repository is at the architectural seed stage. The initial Go service is deliberately small but executable. It demonstrates the core model and gives contributors and coding agents a tested foundation rather than a speculative framework.
+This repository is at the durable-registry stage. It remains a local, unauthenticated prototype rather than a production-ready or multi-tenant service.
 
 ## Quick start
 
@@ -89,3 +89,13 @@ Contributions are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md). Please report
 ## License
 
 ICMN is licensed under the [MIT License](LICENSE).
+
+## Durable local evaluation (Phase 1)
+
+This local prototype is single-tenant, unauthenticated, and only suitable for fictional data. Docker Compose publishes both development ports on loopback, not the network. From a clean checkout, start PostgreSQL and ICMN with one command:
+
+```bash
+docker compose up --build
+```
+
+Then use `http://127.0.0.1:8080`. The named volume preserves data across container restarts; `docker compose down -v` deliberately deletes it. Do not use the checked-in local password outside this fictional local setup. Running `go run ./cmd/icmn` without `DATABASE_URL` retains the non-durable in-memory adapter.

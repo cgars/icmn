@@ -227,3 +227,11 @@ Update this assessment whenever a trust boundary, actor, data class, connector c
 - [OWASP Authorization Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html)
 - [OWASP SSRF Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html)
 - [OWASP CSRF Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html)
+
+## Phase 1 control assessment (2026-09-10)
+
+Phase 1 implements transactional typed-reference uniqueness (a partial control for **TM-04**), transactional application-level audit writes (a partial control for **TM-07**), and idempotent command replay plus recoverable at-least-once outbox leasing (partial controls for **TM-15**). Integration tests cover concurrent reference ownership, command retries, late-write rollback, and competing/expired outbox leases. These controls do **not** mitigate **TM-06** semantic laundering: preventing a UI or projection from hiding domain disagreement still requires the concrete TM-06 controls and scenarios in the catalogue. The catalogue ratings remain inherent ratings; residual risk remains high because audit entries have no hash chain, signed checkpoint, immutable external copy, or privileged-operator protection, while outbox consumers and authenticated delivery are not implemented. The prototype remains unauthenticated, single-tenant, and restricted to fictional local evaluation.
+
+### ELI5
+
+The notebook now saves a diary line and delivery note with each card change. Ordinary application actions do not erase old diary lines, but a powerful database operator could still rewrite the notebook. We have not added the wax seal that would reveal that rewrite.

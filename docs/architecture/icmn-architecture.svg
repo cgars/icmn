@@ -21,7 +21,7 @@
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#526173"/>
     </marker>
     <style>
-      .title{font:700 40px system-ui,-apple-system,Segoe UI,sans-serif;fill:#152238}.tag{font:500 21px system-ui,-apple-system,Segoe UI,sans-serif;fill:#526173}.h{font:700 24px system-ui,-apple-system,Segoe UI,sans-serif;fill:#152238}.sub{font:500 16px system-ui,-apple-system,Segoe UI,sans-serif;fill:#526173}.boxh{font:650 18px system-ui,-apple-system,Segoe UI,sans-serif;fill:#152238}.boxs{font:500 14px system-ui,-apple-system,Segoe UI,sans-serif;fill:#526173}.line{stroke:#526173;stroke-width:2.5;fill:none;marker-end:url(#arrow)}.dash{stroke-dasharray:9 7}.small{font:600 13px system-ui,-apple-system,Segoe UI,sans-serif;fill:#526173;letter-spacing:.03em}.pill{font:650 14px system-ui,-apple-system,Segoe UI,sans-serif;fill:#fff}
+      text{font-family:system-ui,-apple-system,Segoe UI,sans-serif}.title{font-size:40px;font-weight:700;fill:#152238}.tag{font-size:21px;font-weight:500;fill:#526173}.h{font-size:24px;font-weight:700;fill:#152238}.sub{font-size:16px;font-weight:500;fill:#526173}.boxh{font-size:18px;font-weight:650;fill:#152238}.boxs{font-size:14px;font-weight:500;fill:#526173}.line{stroke:#526173;stroke-width:2.5;fill:none;marker-end:url(#arrow)}.dash{stroke-dasharray:9 7}.small{font-size:13px;font-weight:600;fill:#526173;letter-spacing:.03em}.pill{font-size:14px;font-weight:650;fill:#fff}
     </style>
   </defs>
 
@@ -64,13 +64,13 @@
   <text x="655" y="390" class="h">Identity plane</text>
   <text x="655" y="418" class="sub">What are we talking about?</text>
   <rect x="655" y="451" width="350" height="63" rx="14" fill="#fff" stroke="#86aee8"/>
-  <text x="680" y="479" class="boxh">Identity registry</text><text x="680" y="500" class="boxs">Opaque stable ICMN identifiers</text>
+  <text x="680" y="479" class="boxh">Identity registry · IMPLEMENTED</text><text x="680" y="500" class="boxs">Opaque stable ICMN identifiers</text>
   <rect x="655" y="530" width="350" height="63" rx="14" fill="#fff" stroke="#86aee8"/>
-  <text x="680" y="558" class="boxh">Reference registry</text><text x="680" y="579" class="boxs">Typed keys mapped to identities</text>
+  <text x="680" y="558" class="boxh">Reference registry · IMPLEMENTED</text><text x="680" y="579" class="boxs">Typed keys mapped to identities</text>
   <rect x="655" y="609" width="350" height="63" rx="14" fill="#fff" stroke="#86aee8"/>
-  <text x="680" y="637" class="boxh">Match proposals</text><text x="680" y="658" class="boxs">Evidence and explainable confidence</text>
+  <text x="680" y="637" class="boxh">Match proposals · PLANNED</text><text x="680" y="658" class="boxs">Evidence and explainable confidence</text>
   <rect x="655" y="688" width="350" height="63" rx="14" fill="#fff" stroke="#86aee8"/>
-  <text x="680" y="716" class="boxh">Governed decisions</text><text x="680" y="737" class="boxs">Audited, reversible merge and split</text>
+  <text x="680" y="716" class="boxh">Governed decisions · PLANNED</text><text x="680" y="737" class="boxs">Audited, reversible merge and split</text>
 
   <rect x="1080" y="300" width="465" height="475" rx="24" fill="url(#meaning)" stroke="#a65cc5" stroke-width="3" filter="url(#shadow)"/>
   <rect x="1105" y="320" width="158" height="29" rx="14" fill="#a65cc5"/>
@@ -78,20 +78,20 @@
   <text x="1110" y="390" class="h">Meaning plane</text>
   <text x="1110" y="418" class="sub">What does it mean here and now?</text>
   <rect x="1110" y="451" width="405" height="70" rx="14" fill="#fff" stroke="#c89ad9"/>
-  <text x="1135" y="480" class="boxh">Temporal assertion ledger</text><text x="1135" y="503" class="boxs">Domain · predicate · value · validity</text>
+  <text x="1135" y="480" class="boxh">Assertion ledger · IMPLEMENTED</text><text x="1135" y="503" class="boxs">Domain · predicate · value · validity</text>
   <rect x="1110" y="538" width="405" height="70" rx="14" fill="#fff" stroke="#c89ad9"/>
-  <text x="1135" y="567" class="boxh">Schemas and semantic treaties</text><text x="1135" y="590" class="boxs">Versioned agreements, not universal truth</text>
+  <text x="1135" y="567" class="boxh">Semantic treaties · PLANNED</text><text x="1135" y="590" class="boxs">Versioned agreements, not universal truth</text>
   <rect x="1110" y="625" width="405" height="70" rx="14" fill="#fff" stroke="#c89ad9"/>
-  <text x="1135" y="654" class="boxh">Conflict views</text><text x="1135" y="677" class="boxs">Plural assertions remain visible</text>
+  <text x="1135" y="654" class="boxh">Conflict views [PLANNED]</text><text x="1135" y="677" class="boxs">Plural assertions remain visible</text>
   <rect x="1110" y="712" width="112" height="36" rx="18" fill="#3478c9"/><text x="1166" y="735" class="pill" text-anchor="middle">Finance</text>
   <rect x="1234" y="712" width="102" height="36" rx="18" fill="#d8782b"/><text x="1285" y="735" class="pill" text-anchor="middle">Sales</text>
   <rect x="1348" y="712" width="140" height="36" rx="18" fill="#338c58"/><text x="1418" y="735" class="pill" text-anchor="middle">Operations</text>
 
   <rect x="735" y="824" width="675" height="80" rx="19" fill="#312e58" filter="url(#shadow)"/>
-  <text x="1072" y="858" class="h" text-anchor="middle" fill="#fff" style="fill:#fff">Provenance and decision ledger</text>
-  <text x="1072" y="884" class="sub" text-anchor="middle" fill="#dddaf5" style="fill:#dddaf5">Attributable · append-only · explainable · recoverable</text>
+  <text x="1072" y="858" class="h" text-anchor="middle" fill="#fff" style="fill:#fff">Audit · IMPLEMENTED | Decisions · PLANNED</text>
+  <text x="1072" y="884" class="sub" text-anchor="middle" fill="#dddaf5" style="fill:#dddaf5">Transactional audit + outbox; tamper evidence planned</text>
   <rect x="865" y="932" width="415" height="48" rx="18" fill="#fff" stroke="#8a99aa" stroke-width="2"/>
-  <text x="1072" y="962" class="boxh" text-anchor="middle">PostgreSQL · transactional outbox</text>
+  <text x="1072" y="962" class="boxh" text-anchor="middle">PostgreSQL + outbox · IMPLEMENTED</text>
 
   <path d="M325 538 H370" class="line dash"/>
   <path d="M575 538 H625" class="line"/>

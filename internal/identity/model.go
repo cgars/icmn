@@ -44,3 +44,32 @@ type Provenance struct {
 type CreateEntity struct {
 	Kind string `json:"kind"`
 }
+
+// Page describes a stable, creation-ordered page. After is the last ID from
+// the previous page; using a cursor avoids records moving between pages.
+type Page struct {
+	Limit int
+	After string
+}
+
+type EntityPage struct {
+	Items      []Entity `json:"items"`
+	NextCursor string   `json:"next_cursor,omitempty"`
+}
+
+type AuditEvent struct {
+	ID         string          `json:"id"`
+	EntityID   string          `json:"entity_id"`
+	Type       string          `json:"type"`
+	OccurredAt time.Time       `json:"occurred_at"`
+	Details    json.RawMessage `json:"details"`
+}
+
+type OutboxMessage struct {
+	ID          string          `json:"id"`
+	Topic       string          `json:"topic"`
+	Payload     json.RawMessage `json:"payload"`
+	OccurredAt  time.Time       `json:"occurred_at"`
+	Attempts    int             `json:"attempts"`
+	AvailableAt time.Time       `json:"available_at"`
+}

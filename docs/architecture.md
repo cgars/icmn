@@ -6,7 +6,7 @@ ICMN begins as a modular monolith in Go. Clear internal boundaries preserve the 
 
 ICMN keeps a map connecting cards about the same person or company. The cards can stay with their owners. Separate parts look after the map, each owner's statements, and the diary of decisions. A helper may fetch a card only when it has permission; knowing its address is not permission to open it.
 
-This describes the target architecture. The current seed provides an in-memory identity/reference/assertion API; matching, governed decisions, durable audit, connectors, and the steward UI remain planned. See [the ELI5 guide](eli5.md) for examples of each concept.
+This describes the target architecture. Phase 1 provides PostgreSQL identity/reference/assertion persistence, transactional audit/outbox records, and the retained in-memory adapter; matching, governed decisions, connectors, and the steward UI remain planned. See [the ELI5 guide](eli5.md) for examples of each concept.
 
 ## Core model
 
@@ -71,3 +71,11 @@ The maintained [threat assessment](threat-model.md) defines the trust boundaries
 - authorization policy engine boundary
 - canonical JSON representation and assertion value limits
 - connector execution and secret isolation
+
+## Phase 1 durable registry
+
+The implemented service can now compose either the retained in-memory adapter or a PostgreSQL adapter through the consumer-owned identity store contract. When `DATABASE_URL` is present, startup applies versioned migrations and fails rather than silently falling back. Identity, reference, assertion, audit, idempotency, and outbox writes share PostgreSQL transactions. Outbox delivery is recoverable and at-least-once; append-only application behavior is **not** tamper evidence.
+
+### ELI5
+
+Closing the service no longer erases the notebook when PostgreSQL is selected. Each change and its delivery note are saved together. The helper may deliver the same note twice after a crash, so receivers still check the note ID. The notebook has no unforgeable seal yet.

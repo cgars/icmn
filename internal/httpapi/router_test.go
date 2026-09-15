@@ -30,6 +30,13 @@ func TestHealth(t *testing.T) {
 	}
 }
 
+func TestEmptyEntityListIsJSONArray(t *testing.T) {
+	res := request(t, httpapi.New(identity.NewMemoryStore()), http.MethodGet, "/v1/entities", nil)
+	if res.Code != http.StatusOK || !strings.Contains(res.Body.String(), `"items":[]`) {
+		t.Fatalf("status=%d body=%s, want items array", res.Code, res.Body.String())
+	}
+}
+
 func TestCreateAndRetrieveEntity(t *testing.T) {
 	h := httpapi.New(identity.NewMemoryStore())
 	created := createEntity(t, h, "organization")
@@ -340,5 +347,42 @@ func assertError(t *testing.T, res *httptest.ResponseRecorder, status int) {
 	decodeResponse(t, res, &got)
 	if got.Error == "" {
 		t.Fatal("error response has an empty error message")
+	}
+}
+
+func TestListLookupAndIdempotencyContract(t *testing.T) {
+	h := httpapi.New(identity.NewMemoryStore())
+	body := `{"kind":"organization"}`
+	req := httptest.NewRequest(http.MethodPost, "/v1/entities", strings.NewReader(body))
+	req.Header.Set("Idempotency-Key", "create-fictional")
+	res := httptest.NewRecorder()
+	h.ServeHTTP(res, req)
+	var created identity.Entity
+	decodeResponse(t, res, &created)
+	req = httptest.NewRequest(http.MethodPost, "/v1/entities", strings.NewReader(body))
+	req.Header.Set("Idempotency-Key", "create-fictional")
+	res = httptest.NewRecorder()
+	h.ServeHTTP(res, req)
+	var replay identity.Entity
+	decodeResponse(t, res, &replay)
+	if replay.ID != created.ID {
+		t.Fatalf("replay id=%s want %s", replay.ID, created.ID)
+	}
+	ref := `{"source_system":"crm","object_type":"account","source_key":"fictional-42"}`
+	res = request(t, h, http.MethodPost, "/v1/entities/"+created.ID+"/references", strings.NewReader(ref))
+	if res.Code != http.StatusCreated {
+		t.Fatal(res.Body.String())
+	}
+	res = request(t, h, http.MethodGet, "/v1/entities/by-reference?source_system=crm&object_type=account&source_key=fictional-42", nil)
+	var found identity.Entity
+	decodeResponse(t, res, &found)
+	if found.ID != created.ID {
+		t.Fatalf("found=%+v", found)
+	}
+	res = request(t, h, http.MethodGet, "/v1/entities?limit=1", nil)
+	var page identity.EntityPage
+	decodeResponse(t, res, &page)
+	if len(page.Items) != 1 {
+		t.Fatalf("page=%+v", page)
 	}
 }

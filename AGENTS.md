@@ -48,7 +48,7 @@ This runs formatting verification, vetting, and all tests. Add focused tests for
 
 ## Architecture and security documentation
 
-- Treat `docs/architecture/icmn-architecture.drawio` as the editable source for the primary architecture diagram. Keep its SVG and PNG exports synchronized in the same pull request.
+- Treat `docs/architecture/icmn-architecture.drawio` as the editable source for the primary architecture diagram. Keep its text-based SVG export synchronized in the same pull request. CI renders the PNG from that revision and publishes it as a workflow artifact; do not commit the binary PNG.
 - Update the diagram when a component, ownership boundary, trust boundary, persistence mechanism, connector capability, or material data flow changes.
 - Read `docs/threat-model.md` before changing matching, merge/split behavior, authorization, tenancy, connectors, sensitive data handling, telemetry, backup, or deployment boundaries.
 - Update the threat register, assumptions, security invariants, or release gates whenever a change introduces a threat, changes inherent/residual risk, or implements a listed control.
